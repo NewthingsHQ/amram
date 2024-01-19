@@ -27,3 +27,4 @@ void setup() {
 void loop() {
   drawGlyph(char0);  
   delay(1000);
+}
