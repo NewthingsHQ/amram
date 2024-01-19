@@ -6,14 +6,6 @@
 
 Adafruit_8x8matrix matrix = Adafruit_8x8matrix(); 
 
-void setup() {
-  matrix.begin(0x70); 
-}
-
-void loop() {
-  drawGlyph(char0);  
-  delay(1000); 
-
 void drawGlyph(const byte* glyph) {
   matrix.clear();
 
@@ -27,3 +19,11 @@ void drawGlyph(const byte* glyph) {
 
   matrix.writeDisplay();
 }
+
+void setup() {
+  matrix.begin(0x70); 
+}
+
+void loop() {
+  drawGlyph(char0);  
+  delay(1000);
