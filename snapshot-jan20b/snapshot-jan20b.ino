@@ -1,4 +1,4 @@
-// Snapshot Jan20a
+// Snapshot Jan20b
 
 #include <Wire.h>
 #include <Adafruit_GFX.h>
@@ -11,9 +11,9 @@ Adafruit_8x8matrix matrix = Adafruit_8x8matrix();
 void drawGlyph(const byte* glyph, int startCol) {
     matrix.clear();
 
-    for (int row = 0; row < 8; ++row) {
-        for (int col = 0; col < 3; ++col) {
-            if (bitRead(glyph[row], 2 - col) == 1) {
+    for (int col = 0; col < 3; ++col) {
+        for (int row = 0; row < 8; ++row) {
+            if (bitRead(glyph[col], row) == 1) {
                 matrix.drawPixel(startCol + col, row, LED_ON);
             }
         }
@@ -27,6 +27,6 @@ void setup() {
 }
 
 void loop() {
-  drawGlyph(char3, 4);
+  drawGlyph(char0, 0);
   delay(1000);
 }
