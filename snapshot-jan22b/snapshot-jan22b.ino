@@ -1,4 +1,4 @@
-// Snapshot Jan22b
+// Snapshot Jan22c
 
 #include <Wire.h>
 #include <Adafruit_GFX.h>
@@ -50,7 +50,7 @@ void resetTime(bool doReset = false) {
 void setup() {
   matrix.begin(0x70);
   Serial.begin(115200);
-  resetTime(false); // DEFAULT SHOULD BE FALSE
+  resetTime(false); // DEFAULT SHOULD BE FALSE; set to true if just plugged in
 }
 
 void loop() {
