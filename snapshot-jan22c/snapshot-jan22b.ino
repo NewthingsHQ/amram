@@ -60,7 +60,7 @@ void loop() {
   int m1 = minute(t) / 10;
   int m2 = minute(t) % 10;
 
-  drawDigit(h1, 0, true); // Should only be true for this one
+  drawDigit(h1, 0);
   drawDigit(h2, 4);
   drawDigit(m1, 9);
   drawDigit(m2, 13);
