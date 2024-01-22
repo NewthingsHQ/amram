@@ -1,4 +1,4 @@
-// Snapshot Jan22b
+// Snapshot Jan22c
 
 #include <Wire.h>
 #include <Adafruit_GFX.h>
@@ -11,7 +11,8 @@ Adafruit_8x16minimatrix matrix = Adafruit_8x16minimatrix(); // Matrix
 
 const int sw1 = 16;
 const int sw2 = 14; 
-byte cnt = 0; 
+byte cnt = 0;
+byte mode = 0;
 
 void drawGlyph(const byte* glyph, int startDraw, bool clear = false) {
   if (clear) {
@@ -50,20 +51,42 @@ void resetTime(bool doReset = false) {
 void setup() {
   matrix.begin(0x70);
   Serial.begin(115200);
-  resetTime(false); // DEFAULT SHOULD BE FALSE
+  resetTime(false); // DEFAULT SHOULD BE FALSE; set to true if just plugged in
 }
 
 void loop() {
+  int val1 = digitalRead(sw1);
+  int val2 = digitalRead(sw2);
+
+  if(val1==LOW){
+    cnt++;
+  }
+  else if(val2==LOW){
+    cnt--;
+  } 
+
+  //Display value on LED Matrix
+  matrix.clear();
+  matrix.setCursor(3,0);
+  String data = String(cnt);
+  Serial.println(data);
+  matrix.print(data); 
+  matrix.writeDisplay();
+
+  delay(1000);
+
+  /*
   time_t t = now();
   int h1 = hour(t) / 10;
   int h2 = hour(t) % 10;
   int m1 = minute(t) / 10;
   int m2 = minute(t) % 10;
 
-  drawDigit(h1, 0);
+  drawDigit(h1, 0, true); // Should only be true for this one
   drawDigit(h2, 4);
   drawDigit(m1, 9);
   drawDigit(m2, 13);
 
   delay(1000);
+  */
 }
