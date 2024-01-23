@@ -23,7 +23,8 @@ void drawGlyph(const byte* glyph, int startCol) {
 }
 
 void setup() {
-  matrix.begin(0x70); 
+  matrix.begin(0x70);
+  
 }
 
 void loop() {
