@@ -61,9 +61,6 @@ void loop() {
   if(val1==HIGH){
     cnt++;
   }
-  else if(val2==HIGH){
-    cnt--;
-  }
 
   //Display value on LED Matrix
   matrix.clear();
@@ -73,7 +70,7 @@ void loop() {
   matrix.print(data); 
   matrix.writeDisplay();
 
-  delay(1000);
+  delay(200);
 
   /*
   time_t t = now();
