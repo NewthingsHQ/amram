@@ -10,9 +10,9 @@
 Adafruit_8x16minimatrix matrix = Adafruit_8x16minimatrix(); // Matrix
 
 const int sw1 = 16;
-const int sw2 = 14; 
+const int sw2 = 14;
 byte cnt = 0;
-byte mode = 0;
+byte mde = 0;
 
 void drawGlyph(const byte* glyph, int startDraw, bool clear = false) {
   if (clear) {
@@ -54,7 +54,7 @@ void setup() {
   resetTime(false); // DEFAULT SHOULD BE FALSE; set to true if just plugged in
 }
 
-void loop() {
+void loop() { 
   int val1 = digitalRead(sw1);
   int val2 = digitalRead(sw2);
 
@@ -63,7 +63,7 @@ void loop() {
   }
   else if(val2==HIGH){
     cnt--;
-  } 
+  }
 
   //Display value on LED Matrix
   matrix.clear();
