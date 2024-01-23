@@ -5,6 +5,9 @@
 #include <Adafruit_LEDBackpack.h>
 #include <TimeLib.h>
 
+#include <iostream>
+using namespace std;
+
 #include "amrled.h"
 
 Adafruit_8x16minimatrix matrix = Adafruit_8x16minimatrix(); // Matrix
@@ -42,6 +45,14 @@ void drawDigit(int digit, int startDraw, bool clear = false) {
   }
 }
 
+string addZeros(int num, int length) {
+  str s = to_string(num);
+  while (s.length() < length) {
+    s = "0" + s;
+  }
+  return s;
+}
+
 void resetTime(bool doReset = false) {
   if (doReset) {
     setTime(8,0,0,1,1,2024);
@@ -52,23 +63,38 @@ void setup() {
   matrix.begin(0x70);
   Serial.begin(115200);
   resetTime(false); // DEFAULT SHOULD BE FALSE; set to true if just plugged in
+  pinMode(sw1, INPUT_PULLUP);
+  pinMode(sw2, INPUT_PULLUP);
 }
 
 void loop() { 
   int val1 = digitalRead(sw1);
   int val2 = digitalRead(sw2);
 
-  if(val1==HIGH){
+/*
+
+  * ---- BUTTON TESTING CODE ---- *
+
+  if(val1==LOW){
     cnt++;
   }
 
   //Display value on LED Matrix
   matrix.clear();
   matrix.setCursor(3,0);
-  String data = String(cnt);
+  String data = addZeros(cnt, 4)
   Serial.println(data);
-  matrix.print(data); 
-  matrix.writeDisplay();
+
+for (int i=0; i<4; i++) {
+  if (i < data.length()) {
+    drawDigit(int(data.charAt(i) - '0'), i*4+i/2, i==0 ? true : false);
+  } else {
+    drawDigit(0, i*4+i/2, false); // Draw 0 for missing digits
+  }
+}
+
+*/
+
 
   delay(200);
 
