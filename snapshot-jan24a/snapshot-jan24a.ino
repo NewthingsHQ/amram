@@ -6,8 +6,7 @@
 
   ~~~ TODO LIST ~~~
 
-  ? URGENT: Fix Time Adjust Mechanism
-  ? URGENT: Add day change mechanism also
+  O URGENT: Fix Time Adjust Mechanism
   X MEDIUM: Figure out how to actually add new medicine
   - OTHERS: -
 
@@ -40,13 +39,13 @@ const int sw2 = 14;
 byte cnt = 0;
 byte mde = 0;
 
-long pressTime = 0;
-
 time_t t = now();
 int h1 = hour(t) / 10;
 int h2 = hour(t) % 10;
 int m1 = minute(t) / 10;
 int m2 = minute(t) % 10;
+
+long pressTime = 0;
 
 // --- DRAWING FUNCTIONS --- //
 
@@ -113,7 +112,7 @@ int val2 = digitalRead(sw2);
 void changeTime() {
   // Setup
   bool displayOn = true;
-  unsinged long blinkTime = millis();
+  unsigned long blinkTime = millis();
 
   // Hour
   if (millis() - blinkTime >= 500) {
@@ -136,7 +135,7 @@ void changeTime() {
   drawDigit(h2, 4);
   if (val1 == LOW && val2 == LOW) {
     if (millis() - pressTime >= 1000) {
-      break;
+      return;
     }
   } else if (val1 == LOW) {
     adjustTime(3600);
@@ -164,7 +163,7 @@ void changeTime() {
   drawDigit(m2, 13);
   if (val1 == LOW && val2 == LOW) {
     if (millis() - pressTime >= 1000) {
-      break;
+      return;
     }
   } else if (val1 == LOW) {
     adjustTime(60);
@@ -179,8 +178,15 @@ void changeTime() {
 // --- MAIN LOOP --- //
 
 void loop() { 
+  t = now();
+  h1 = hour(t) / 10;
+  h2 = hour(t) % 10;
+  m1 = minute(t) / 10;
+  m2 = minute(t) % 10;
+
   int val1 = digitalRead(sw1);
   int val2 = digitalRead(sw2);
+
   long presstime = 0;
 
   drawDigit(h1, 0, true); // Should only be true for this one
@@ -192,7 +198,9 @@ void loop() {
     if (pressTime == 0) {
       pressTime = millis();
     } else if (millis() - pressTime >= 1000) {
+      while (val1 == LOW || val2 == LOW) { }
       changeTime();
+      pressTime = 0;
     }
   }
 
