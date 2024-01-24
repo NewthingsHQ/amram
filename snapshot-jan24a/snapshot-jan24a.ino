@@ -1,14 +1,27 @@
 // Snapshot Jan24a
 
 /*
+  
+  DEVELOPER CORNER
 
   ~~~ TODO LIST ~~~
-  URGENT: Fix Time Adjust Mechanism
-  URGENT: Add day change mechanism also
-  MEDIUM: Figure out how to actually add new medicine
-  OTHERS: -
+
+  ? URGENT: Fix Time Adjust Mechanism
+  ? URGENT: Add day change mechanism also
+  X MEDIUM: Figure out how to actually add new medicine
+  - OTHERS: -
+
+  ~~~ LEGEND ~~~
+
+  / : Done
+  ? : Done, but not tested
+  O : In progress
+  X : Not done
+  - : N/A
 
 */
+
+// --- INITIALIZE --- //
 
 #include <Wire.h>
 #include <Adafruit_GFX.h>
@@ -34,6 +47,8 @@ int h1 = hour(t) / 10;
 int h2 = hour(t) % 10;
 int m1 = minute(t) / 10;
 int m2 = minute(t) % 10;
+
+// --- DRAWING FUNCTIONS --- //
 
 void drawGlyph(const byte* glyph, int startDraw, bool clear = false) {
   if (clear) {
@@ -63,6 +78,9 @@ void drawDigit(int digit, int startDraw, bool clear = false) {
   }
 }
 
+
+// --- TIME FUNCTIONS --- //
+
 string addZeros(string s, int length) {
   while (s.length() < length) {
     s = "0" + s;
@@ -77,6 +95,8 @@ void resetTime(bool doReset = false) {
   }
 }
 
+// --- SETUP --- //
+
 void setup() {
   matrix.begin(0x70);
   Serial.begin(115200);
@@ -88,8 +108,24 @@ void setup() {
 int val1 = digitalRead(sw1);
 int val2 = digitalRead(sw2);
 
+// --- TIME CHANGE MECHANISM --- //
+
 void changeTime() {
+  // Setup
+  bool displayOn = true;
+  unsinged long blinkTime = millis();
+
   // Hour
+  if (millis() - blinkTime >= 500) {
+    displayOn = !displayOn;
+    blinkTime = millis();
+  }
+  if (displayOn) {
+    drawDigit(h1, 0, true);
+    drawDigit(h2, 4);
+  } else {
+    matrix.clear();
+  }
   if (val1 == LOW && val2 == LOW) {
     while (val1 == LOW && val2 == LOW) { }
   }
@@ -99,45 +135,48 @@ void changeTime() {
   drawDigit(h1, 0, true);
   drawDigit(h2, 4);
   if (val1 == LOW && val2 == LOW) {
-    while (val1 == LOW & val2 == LOW) { }
-  }
-    if (pressTime == 0) {
-      pressTime = millis();
-    } else if (millis() - pressTime >= 1000) {
-      goto hour_complete;
+    if (millis() - pressTime >= 1000) {
+      break;
     }
   } else if (val1 == LOW) {
-    newHour = (oldHour + 1) % 24;
+    adjustTime(3600);
+    pressTime = millis();
   } else if (val2 == LOW) {
-    newHour = (oldHour - 1) % 24;
+    adjustTime(-3600);
+    pressTime = millis();
   }
 
-  hour_complete:
-
   // Minute
+  if (millis() - blinkTime >= 500) {
+    displayOn = !displayOn;
+    blinkTime = millis();
+  }
+  if (displayOn) {
+    drawDigit(m1, 9, true);
+    drawDigit(m2, 13);
+  } else {
+    matrix.clear();
+  }
   pressTime = 0;
   int oldMinute = minute(t);
   int newMinute = oldMinute;
   drawDigit(m1, 9, true);
   drawDigit(m2, 13);
   if (val1 == LOW && val2 == LOW) {
-    if (pressTime == 0) {
-      pressTime = millis();
-    } else if (millis() - pressTime >= 1000) {
-      goto minute_complete;
+    if (millis() - pressTime >= 1000) {
+      break;
     }
   } else if (val1 == LOW) {
-    newMinute = (oldMinute + 1) % 60;
+    adjustTime(60);
+    pressTime = millis();
   } else if (val2 == LOW) {
-    newMinute = (oldMinute - 1) % 60;
+    adjustTime(-60);
+    pressTime = millis();
   }
 
-  minute_complete:
-
-  setTime(newHour, newMinute, 0, 1, 1, 2024);
-  // TODO: Add mechanism to change the date also
 }
 
+// --- MAIN LOOP --- //
 
 void loop() { 
   int val1 = digitalRead(sw1);
