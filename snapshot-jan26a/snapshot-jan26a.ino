@@ -1,4 +1,4 @@
-// Snapshot Jan25c
+// Snapshot Jan26a
 
 /*
   
@@ -6,7 +6,7 @@
 
   ~~~ TODO LIST ~~~
 
-  O URGENT: Fix Time Adjust Mechanism
+  / URGENT: Fix Time Adjust Mechanism
   X MEDIUM: Figure out how to actually add new medicine
   - OTHERS: -
 
@@ -26,6 +26,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_LEDBackpack.h>
 #include <TimeLib.h>
+#include <RTClib.h>
 
 #include <iostream>
 using namespace std;
@@ -39,7 +40,7 @@ const int sw2 = 14;
 byte cnt = 0;
 byte mde = 0;
 
-time_t t = now();
+time_t t = RTC.now();
 int h1 = hour(t) / 10;
 int h2 = hour(t) % 10;
 int m1 = minute(t) / 10;
@@ -116,11 +117,12 @@ void changeTime() {
 
   // Hour
   while (true) {
-    bool skipAdjustment = false;
+    bool changing = false;
+
     int val1 = digitalRead(sw1);
     int val2 = digitalRead(sw2);
 
-    t = now();
+    t = RTC.now();
     h1 = hour(t) / 10;
     h2 = hour(t) % 10;
     m1 = minute(t) / 10;
@@ -137,35 +139,32 @@ void changeTime() {
       matrix.clear();
     }
     if (val1 == LOW && val2 == LOW) {
-      skipAdjustment = true; // Set flag
+      changing = true;
       while (digitalRead(sw1) == LOW && digitalRead(sw2) == LOW) { }
-    } else if (val1 == LOW && !skipAdjustment) { // Check flag
+      break;
+    } else if (val1 == LOW && !changing) {
       delay(200);
       if (val2 == HIGH) {
         adjustTime(3600);
       }
       delay(200);
-    } else if (val2 == LOW && !skipAdjustment) { // Check flag
+    } else if (val2 == LOW && !changing) {
       delay(200);
       if (val1 == HIGH) {
         adjustTime(-3600);
       }
       delay(200);
     }
-
-    if ((val1 == HIGH && val2 == HIGH) && !skipAdjustment) {
-      skipAdjustment = false; // Reset flag at the end of the loop
-      break;
-    }
   }
 
   // Minute
   while (true) {
-    bool skipAdjustment = false;
+    bool changing = false;
+
     int val1 = digitalRead(sw1);
     int val2 = digitalRead(sw2);
 
-    t = now();
+    t = RTC.now();
     h1 = hour(t) / 10;
     h2 = hour(t) % 10;
     m1 = minute(t) / 10;
@@ -182,25 +181,21 @@ void changeTime() {
       matrix.clear();
     }
     if (val1 == LOW && val2 == LOW) {
-      skipAdjustment = true; // Set flag
+      changing = true;
       while (digitalRead(sw1) == LOW && digitalRead(sw2) == LOW) { }
-    } else if (val1 == LOW && !skipAdjustment) { // Check flag
+      break;
+    } else if (val1 == LOW && !changing) {
       delay(200);
       if (val2 == HIGH) {
         adjustTime(60);
       }
       delay(200);
-    } else if (val2 == LOW && !skipAdjustment) { // Check flag
+    } else if (val2 == LOW && !changing) {
       delay(200);
       if (val1 == HIGH) {
         adjustTime(-60);
       }
       delay(200);
-    }
-
-    if ((val1 == HIGH && val2 == HIGH) && !skipAdjustment) {
-      skipAdjustment = false; // Reset flag at the end of the loop
-      break;
     }
   }
 }
@@ -208,7 +203,7 @@ void changeTime() {
 // --- MAIN LOOP --- //
 
 void loop() { 
-  t = now();
+  t = RTC.now();
   h1 = hour(t) / 10;
   h2 = hour(t) % 10;
   m1 = minute(t) / 10;
