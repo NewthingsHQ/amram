@@ -1,4 +1,4 @@
-// Snapshot Jan25a
+// Snapshot Jan25c
 
 /*
   
@@ -115,64 +115,90 @@ void changeTime() {
   unsigned long blinkTime = millis();
 
   // Hour
-  if (millis() - blinkTime >= 500) {
-    displayOn = !displayOn;
-    blinkTime = millis();
-  }
-  if (displayOn) {
-    drawDigit(h1, 0, true);
-    drawDigit(h2, 4);
-  } else {
-    matrix.clear();
-  }
-  if (val1 == LOW && val2 == LOW) {
-    while (val1 == LOW && val2 == LOW) { }
-  }
-  pressTime = 0;
-  int oldHour = hour(t);
-  int newHour = oldHour;
-  drawDigit(h1, 0, true);
-  drawDigit(h2, 4);
-  if (val1 == LOW && val2 == LOW) {
-    if (millis() - pressTime >= 1000) {
-      return;
+  while (true) {
+    int val1 = digitalRead(sw1);
+    int val2 = digitalRead(sw2);
+
+    t = now();
+    h1 = hour(t) / 10;
+    h2 = hour(t) % 10;
+    m1 = minute(t) / 10;
+    m2 = minute(t) % 10;
+
+    if (millis() - blinkTime >= 500) {
+      displayOn = !displayOn;
+      blinkTime = millis();
     }
-  } else if (val1 == LOW) {
-    adjustTime(3600);
-    pressTime = millis();
-  } else if (val2 == LOW) {
-    adjustTime(-3600);
-    pressTime = millis();
+    if (displayOn) {
+      drawDigit(h1, 0, true);
+      drawDigit(h2, 4);
+    } else {
+      matrix.clear();
+    }
+    if (val1 == LOW && val2 == LOW) {
+      skipAdjustment = true; // Set flag
+      while (digitalRead(sw1) == LOW && digitalRead(sw2) == LOW) { }
+    } else if (val1 == LOW && !skipAdjustment) { // Check flag
+      delay(200);
+      if (val2 == HIGH) {
+        adjustTime(3600);
+      }
+      delay(200);
+    } else if (val2 == LOW && !skipAdjustment) { // Check flag
+      delay(200);
+      if (val1 == HIGH) {
+        adjustTime(-3600);
+      }
+      delay(200);
+    }
+
+    if (val1 == HIGH && val2 == HIGH) {
+      skipAdjustment = false; // Reset flag at the end of the loop
+    }
   }
 
   // Minute
-  if (millis() - blinkTime >= 500) {
-    displayOn = !displayOn;
-    blinkTime = millis();
-  }
-  if (displayOn) {
-    drawDigit(m1, 9, true);
-    drawDigit(m2, 13);
-  } else {
-    matrix.clear();
-  }
-  pressTime = 0;
-  int oldMinute = minute(t);
-  int newMinute = oldMinute;
-  drawDigit(m1, 9, true);
-  drawDigit(m2, 13);
-  if (val1 == LOW && val2 == LOW) {
-    if (millis() - pressTime >= 1000) {
-      return;
-    }
-  } else if (val1 == LOW) {
-    adjustTime(60);
-    pressTime = millis();
-  } else if (val2 == LOW) {
-    adjustTime(-60);
-    pressTime = millis();
-  }
+  while (true) {
+    int val1 = digitalRead(sw1);
+    int val2 = digitalRead(sw2);
 
+    t = now();
+    h1 = hour(t) / 10;
+    h2 = hour(t) % 10;
+    m1 = minute(t) / 10;
+    m2 = minute(t) % 10;
+
+    if (millis() - blinkTime >= 500) {
+      displayOn = !displayOn;
+      blinkTime = millis();
+    }
+    if (displayOn) {
+      drawDigit(m1, 9, true);
+      drawDigit(m2, 13);
+    } else {
+      matrix.clear();
+    }
+    if (val1 == LOW && val2 == LOW) {
+      skipAdjustment = true; // Set flag
+      while (digitalRead(sw1) == LOW && digitalRead(sw2) == LOW) { }
+    } else if (val1 == LOW && !skipAdjustment) { // Check flag
+      delay(200);
+      if (val2 == HIGH) {
+        adjustTime(60);
+      }
+      delay(200);
+    } else if (val2 == LOW && !skipAdjustment) { // Check flag
+      delay(200);
+      if (val1 == HIGH) {
+        adjustTime(-60);
+      }
+      delay(200);
+    }
+
+    if (val1 == HIGH && val2 == HIGH) {
+      skipAdjustment = false; // Reset flag at the end of the loop
+    }
+  }
 }
 
 // --- MAIN LOOP --- //
