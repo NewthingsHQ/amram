@@ -34,17 +34,18 @@ using namespace std;
 #include "amrled.h"
 
 Adafruit_8x16minimatrix matrix = Adafruit_8x16minimatrix(); // Matrix
+RTC_DS3231 RTC; // RTC
 
 const int sw1 = 16;
 const int sw2 = 14;
 byte cnt = 0;
 byte mde = 0;
 
-time_t t = RTC.now();
-int h1 = hour(t) / 10;
-int h2 = hour(t) % 10;
-int m1 = minute(t) / 10;
-int m2 = minute(t) % 10;
+DateTime t = RTC.now();
+int h1 = t.hour() / 10;
+int h2 = t.hour() % 10;
+int m1 = t.minute() / 10;
+int m2 = t.minute() % 10;
 
 long pressTime = 0;
 
@@ -123,10 +124,10 @@ void changeTime() {
     int val2 = digitalRead(sw2);
 
     t = RTC.now();
-    h1 = hour(t) / 10;
-    h2 = hour(t) % 10;
-    m1 = minute(t) / 10;
-    m2 = minute(t) % 10;
+    h1 = t.hour() / 10;
+    h2 = t.hour() % 10;
+    m1 = t.minute() / 10;
+    m2 = t.minute() % 10;
 
     if (millis() - blinkTime >= 500) {
       displayOn = !displayOn;
@@ -165,10 +166,10 @@ void changeTime() {
     int val2 = digitalRead(sw2);
 
     t = RTC.now();
-    h1 = hour(t) / 10;
-    h2 = hour(t) % 10;
-    m1 = minute(t) / 10;
-    m2 = minute(t) % 10;
+    h1 = t.hour() / 10;
+    h2 = t.hour() % 10;
+    m1 = t.minute() / 10;
+    m2 = t.minute() % 10;
 
     if (millis() - blinkTime >= 500) {
       displayOn = !displayOn;
@@ -204,10 +205,10 @@ void changeTime() {
 
 void loop() { 
   t = RTC.now();
-  h1 = hour(t) / 10;
-  h2 = hour(t) % 10;
-  m1 = minute(t) / 10;
-  m2 = minute(t) % 10;
+  h1 = t.hour() / 10;
+  h2 = t.hour() % 10;
+  m1 = t.minute() / 10;
+  m2 = t.minute() % 10;
 
   int val1 = digitalRead(sw1);
   int val2 = digitalRead(sw2);
