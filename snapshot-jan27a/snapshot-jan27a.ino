@@ -1,4 +1,4 @@
-// Snapshot Jan25c
+// Snapshot Jan25d
 
 /*
   
@@ -6,11 +6,11 @@
 
   ~~~ TODO LIST ~~~
 
-  O URGENT: Fix Time Adjust Mechanism
+  / URGENT: Fix Time Adjust Mechanism
   X MEDIUM: Figure out how to actually add new medicine
   - OTHERS: -
-a
-  ~~~ LEGEND ~~~a
+
+  ~~~ LEGEND ~~~
 
   / : Done
   ? : Done, but not tested
@@ -26,6 +26,7 @@ a
 #include <Adafruit_GFX.h>
 #include <Adafruit_LEDBackpack.h>
 #include <TimeLib.h>
+#include <RTClib.h>
 
 #include <iostream>
 using namespace std;
@@ -111,57 +112,35 @@ int val2 = digitalRead(sw2);
 
 void changeTime() {
   // Setup
-  bool displayOn = true;
+  bool changing = false;
   unsigned long blinkTime = millis();
 
   // Hour
   while (true) {
-    bool skipAdjustment = false;
     int val1 = digitalRead(sw1);
     int val2 = digitalRead(sw2);
-
     t = now();
     h1 = hour(t) / 10;
     h2 = hour(t) % 10;
     m1 = minute(t) / 10;
     m2 = minute(t) % 10;
 
-    if (millis() - blinkTime >= 500) {
-      displayOn = !displayOn;
-      blinkTime = millis();
-    }
-    if (displayOn) {
-      drawDigit(h1, 0, true);
-      drawDigit(h2, 4);
-    } else {
-      matrix.clear();
-    }
-    if (val1 == LOW && val2 == LOW) {
-      skipAdjustment = true; // Set flag
-      while (digitalRead(sw1) == LOW && digitalRead(sw2) == LOW) { }
-    } else if (val1 == LOW && !skipAdjustment) { // Check flag
+    drawDigit(h1, 0, true);
+    drawDigit(h2, 4);
+    
+    if (val1 == LOW) {
+      adjustTime(3600);
       delay(200);
-      if (val2 == HIGH) {
-        adjustTime(3600);
-      }
-      delay(200);
-    } else if (val2 == LOW && !skipAdjustment) { // Check flag
-      delay(200);
-      if (val1 == HIGH) {
-        adjustTime(-3600);
-      }
-      delay(200);
-    }
-
-    if ((val1 == HIGH && val2 == HIGH) && !skipAdjustment) {
-      skipAdjustment = false; // Reset flag at the end of the loop
+    } else if (val2 == LOW) {
+      while (val2 == LOW) { 
+        val2 = digitalRead(sw2);
+      };
       break;
     }
   }
 
   // Minute
   while (true) {
-    bool skipAdjustment = false;
     int val1 = digitalRead(sw1);
     int val2 = digitalRead(sw2);
 
@@ -171,35 +150,13 @@ void changeTime() {
     m1 = minute(t) / 10;
     m2 = minute(t) % 10;
 
-    if (millis() - blinkTime >= 500) {
-      displayOn = !displayOn;
-      blinkTime = millis();
-    }
-    if (displayOn) {
-      drawDigit(m1, 9, true);
-      drawDigit(m2, 13);
-    } else {
-      matrix.clear();
-    }
-    if (val1 == LOW && val2 == LOW) {
-      skipAdjustment = true; // Set flag
-      while (digitalRead(sw1) == LOW && digitalRead(sw2) == LOW) { }
-    } else if (val1 == LOW && !skipAdjustment) { // Check flag
-      delay(200);
-      if (val2 == HIGH) {
-        adjustTime(60);
-      }
-      delay(200);
-    } else if (val2 == LOW && !skipAdjustment) { // Check flag
-      delay(200);
-      if (val1 == HIGH) {
-        adjustTime(-60);
-      }
-      delay(200);
-    }
+    drawDigit(m1, 9, true);
+    drawDigit(m2, 13);
 
-    if ((val1 == HIGH && val2 == HIGH) && !skipAdjustment) {
-      skipAdjustment = false; // Reset flag at the end of the loop
+    if (val1 == LOW) {
+      adjustTime(60);
+      delay(200); 
+    } else if (val2 == LOW) {
       break;
     }
   }
