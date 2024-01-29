@@ -1,14 +1,28 @@
 // Snapshot Jan29a
 
 /*
+  This code is for the Amram Board project. It includes functionality for displaying time on an 8x16 LED matrix, adjusting the time using two switches, fetching an email address from a server, and connecting to a WiFi network.
+
+  TODO List:
+  X TOMRWW: ADD THE PASSWORD FETCH MECHANISM
+
+  Legend:
+  / : Done
+  ? : Done, but not tested
+  O : In progress
+  X : Not done
+  - : N/A
+*/
+// Snapshot Jan29a
+
+/*
   
   DEVELOPER CORNER
 
   ~~~ TODO LIST ~~~
 
-  / URGENT: Fix Time Adjust Mechanism
-  X MEDIUM: Figure out how to actually add new medicine
-  - OTHERS: -
+  / TOMRWW: ADD PASSWORD FETCH MECHANISM
+  / TOMRWW: FIX THE BELOW CODE FOR FIREBASE
 
   ~~~ LEGEND ~~~
 
@@ -57,6 +71,22 @@ int m2 = minute(t) % 10;
 
 long pressTime = 0;
 
+// --- FIREBASE INIT --- //
+
+#define SSID "Amramconnect"
+#define PASSWORD "danunaidum123"
+#define API_KEY "AIzaSyAN8iGMfpIZEnS5mxrW5uRfMqWXpeAuSSc"
+#define FIREBASE_PROJECT_ID "amramdotclick"
+#define USER_EMAIL emailFetch()
+#define USER_PASSWORD passFetch()
+
+FirebaseData fbdo;
+FirebaseAuth auth;
+FirebaseConfig config;
+
+bool taskCompleted = false;
+unsigned long dataMillis = 0;
+
 // --- DRAWING FUNCTIONS --- //
 
 void drawGlyph(const byte* glyph, int startDraw, bool clear = false) {
@@ -104,14 +134,57 @@ void resetTime(bool doReset = false) {
   }
 }
 
+// --- SPECIAL INIT FOR WIFI --- //
+
+#include <WiFi.h>
+#include <HTTPClient.h>
+
+const char* ssid = "Amramconnect";
+const char* password = "danunaidum123";
+
+WiFiServer server(80);
+
+String header;
+String email = "";
+String password = "" // ADD TOMORROW!!!!!
+
+unsigned long currentTime = millis();
+unsigned long previousTime = 0;
+const long timeoutTime = 2000;
+
 // --- SETUP --- //
 
 void setup() {
   matrix.begin(0x70);
   Serial.begin(115200);
-  resetTime(false); // DEFAULT SHOULD BE FALSE; set to true if just plugged in
+  resetTime(false); // Default should be FALSE
   pinMode(sw1, INPUT_PULLUP);
   pinMode(sw2, INPUT_PULLUP);
+
+  WiFi.begin(ssid, password);
+  Serial.print("Connecting to Amramconnect Services")
+  while ((WiFi.status() != WL_CONNECTED) && (millis() - currentTime < 60000)) {
+    delay(500);
+    Serial.print(".")
+  }
+
+  Serial.println("");
+  Serial.println("Connected to Amramconnect. IP: ");
+  Serial.print(WiFi.localIP());
+
+  Serial.printf("Firebase Client v%s\n\n", FIREBASE_CLIENT_VERSION);
+
+  config.api_key = API_KEY;
+  auth.user.email = USER_EMAIL;
+  auth.user.password = USER_PASSWORD;
+
+  config.token_status_callback = tokenStatusCallback;
+  Firebase.reconnectNetwork(true);
+  fbdo.setBSSLBufferSize(4096, 1024);
+  fbdo.setResponseSize(1024);
+
+  Firebae.begin(&config, &auth);q
+  server.begin();
 }
 
 int val1 = digitalRead(sw1);
@@ -171,16 +244,75 @@ void changeTime() {
   }
 }
 
+// --- EMAIL FETCH --- //
+
+var med = [];
+
+string emailFetch() {
+  WiFiClient client = server.available();
+  if (client) {
+    Serial.println("Connected to Amramconnect Client")
+    String currentLine = "";
+    currentTime = millis();
+    previousTime = currentTime;
+
+    while (client.connected() && currentTime - previousTime <= timeoutTime) {
+      currentTime = millis();
+      if (client.available()) {
+
+        if (header.indexOf("GET /email") >= 0) {
+          HTTPClient http;
+          http.begin("https://amram.click/getemail.html");
+          int httpCode = http.GET();
+
+          if (httpCode > 0) {
+            String payload = http.getString();
+            email = payload;
+            Serial.println(email);
+            return email;
+          } else {
+            Serial.println("Error on HTTP request");
+          }
+
+      http.end();
+    }
+  }
+}
+
+string passFetch() {
+  // DO TOMORROW
+}
+
 // --- FIREBASE --- //
 
-int runtime = millis();
-int starttime = runtime;
-while ((runtime - starttime) < 3000) {
-  if (digitalRead(WIFI_SET_PIN) == LOW) {
-    Serial.println("WIFI SETUP MODE");
-    wifiSetup();
-    break;
+void firebaseLoop() {
+  if (WiFi.status() == WL_CONNECTED) {
+    if (Firebase.ready()) {
+      if (!taskCompleted) {
+        if (dataMillis == 0 || millis() - dataMillis > 5000) {
+          dataMillis = millis();
+          for (int i = 1; i <= 32; i++) {
+            dat = Firebase.get(fbdo, `${email}/med-${i}`);
+            var med = med.concat(/**/) // GET THIS DONE QUICK
+        }
+        if (Firebase.failed()) {
+          Serial.println("Error getting medicine");
+          Serial.println(fbdo.errorReason());
+          Serial.println("-----------------------------");
+          Serial.println();
+          return;
+        }
+        if (fbdo.dataType() == "string") {
+          Serial.println(fbdo.stringData());
+        }
+
+        user_MEDS = fbdo.stringData(
+
+        taskCompleted = true;
+      }
+    }
   }
+
 }
 
 // --- MAIN LOOP --- //

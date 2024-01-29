@@ -34,7 +34,7 @@ using namespace std;
 #include "amrled.h"
 
 Adafruit_8x16minimatrix matrix = Adafruit_8x16minimatrix(); // Matrix
-RTC_DS3231 RTC; // RTC
+RTC_DS1307 RTC; // RTC
 
 const int sw1 = 16;
 const int sw2 = 14;
