@@ -1,4 +1,4 @@
-// Snapshot Jan27a
+// Snapshot Jan29a
 
 /*
   
@@ -27,6 +27,15 @@
 #include <Adafruit_LEDBackpack.h>
 #include <TimeLib.h>
 #include <RTClib.h>
+
+#include <WifiSetup.h>
+#include <Wifi.h>
+#include <WebServer.h>
+#include <time.h>
+#include <AutoConnect.h>
+
+#include <Firebase_ESP_Client.h>
+#include <addons/TokenHelper/TokenHelper.h>
 
 #include <iostream>
 using namespace std;
@@ -159,6 +168,18 @@ void changeTime() {
     } else if (val2 == LOW) {
       break;
     }
+  }
+}
+
+// --- FIREBASE --- //
+
+int runtime = millis();
+int starttime = runtime;
+while ((runtime - starttime) < 3000) {
+  if (digitalRead(WIFI_SET_PIN) == LOW) {
+    Serial.println("WIFI SETUP MODE");
+    wifiSetup();
+    break;
   }
 }
 
