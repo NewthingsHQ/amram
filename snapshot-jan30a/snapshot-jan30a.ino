@@ -256,7 +256,7 @@ string emailFetch() {
     currentTime = millis();
     previousTime = currentTime;
 
-    while (client.connected() && currentTime - previousTime <= timeoutTime) {
+    while (client.connected() && currentTime - previousTime <= 300000) {
       currentTime = millis();
       if (client.available()) {
 
@@ -287,7 +287,7 @@ string passFetch() {
     currentTime = millis();
     previousTime = currentTime;
 
-    while (client.connected() && currentTime - previousTime <= timeoutTime) {
+    while (client.connected() && currentTime - previousTime <= 300000) {
       currentTime = millis();
       if (client.available()) {
 
@@ -321,13 +321,13 @@ void firebaseLoop() {
     currentTime = millis();
     previousTime = currentTime;
 
-    while (client.connected() && currentTime - previousTime <= timeoutTime) {
+    while (client.connected() && currentTime - previousTime <= 300000) {
       currentTime = millis();
       if (client.available()) {
 
-        if (header.indexOf("GET /pass") >= 0) {
+        if (header.indexOf("GET /data") >= 0) {
           HTTPClient http;
-          http.begin("https://amram.click/data/password.html");
+          http.begin("https://amram.click/data/getmeds.html");
           int httpCode = http.GET();
 
           if (httpCode > 0) {
