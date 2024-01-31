@@ -310,11 +310,12 @@ std::string firebaseLoop() {
           http.begin("https://amram.click/data/getmeds.html");
           int httpCode = http.GET();
 
-          if (httpCode > 0) {
+          if (httpCode = 200) {
             String payload = http.getString();
             String dat = payload;
             std::string DATA = dat.c_str();
-            Serial.println(dat);
+            Serial.println("Data:");
+            Serial.print(dat);
             return DATA;
           } else {
             Serial.println("Error on HTTP request");
