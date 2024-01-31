@@ -42,8 +42,7 @@
 #include <TimeLib.h>
 #include <RTClib.h>
 
-#include <WifiSetup.h>
-#include <Wifi.h>
+#include <WiFi.h>
 #include <WebServer.h>
 #include <time.h>
 #include <AutoConnect.h>
@@ -52,6 +51,10 @@
 #include <addons/TokenHelper/TokenHelper.h>
 
 #include <iostream>
+#include <sstream>
+#include <vector>
+#include <string>
+
 using namespace std;
 
 #include "amrled.h"
@@ -145,8 +148,8 @@ const char* password = "danunaidum123";
 WiFiServer server(80);
 
 String header;
-String email = "";
-String password = "";
+String email"";
+String password"";
 
 unsigned long currentTime = millis();
 unsigned long previousTime = 0;
@@ -244,15 +247,15 @@ void changeTime() {
   }
 }
 
-// --- EMAIL FETCH --- //
+/*
 
-var med = [];
+// --- EMAIL FETCH --- //
 
 string emailFetch() {
   WiFiClient client = server.available();
   if (client) {
     Serial.println("Connected to Amramconnect Client")
-    String currentLine = "";
+    String currentLine"";
     currentTime = millis();
     previousTime = currentTime;
 
@@ -266,7 +269,7 @@ string emailFetch() {
           int httpCode = http.GET();
 
           if (httpCode > 0) {
-            String payload = http.getString();
+            String payloadhttp.getString();
             email = payload;
             Serial.println(email);
             return email;
@@ -283,7 +286,7 @@ string passFetch() {
   WiFiClient client = server.available();
   if (client) {
     Serial.println("Connected to Amramconnect Client")
-    String currentLine = "";
+    String currentLine"";
     currentTime = millis();
     previousTime = currentTime;
 
@@ -297,7 +300,7 @@ string passFetch() {
           int httpCode = http.GET();
 
           if (httpCode > 0) {
-            String payload = http.getString();
+            String payloadhttp.getString();
             password = payload;
             Serial.println(password);
             return password;
@@ -311,13 +314,15 @@ string passFetch() {
 }}
 }
 
+*/
+
 // --- FIREBASE --- //
 
 void firebaseLoop() {
   WiFiClient client = server.available();
   if (client) {
     Serial.println("Connected to Amramconnect Client")
-    String currentLine = "";
+    String currentLine"";
     currentTime = millis();
     previousTime = currentTime;
 
@@ -331,9 +336,10 @@ void firebaseLoop() {
           int httpCode = http.GET();
 
           if (httpCode > 0) {
-            String payload = http.getString();
-            meddata = payload;
-            
+            String payloadhttp.getString();
+            data = payload;
+            Serial.println(data);
+            return data;
           } else {
             Serial.println("Error on HTTP request");
           }
@@ -346,7 +352,40 @@ void firebaseLoop() {
 
 // --- MEDICINE NOTIFICATION --- //
 
+std::string groups[384];
+std::string temp[384];
+std::string MEDDATA[384];
 
+void split(string str, char seperator)  
+{  
+    int currIndex = 0, i = 0;  
+    int startIndex = 0, endIndex = 0;  
+    while (i <= sizeof(str))  
+    {  
+        if (str[i] == seperator || i == len(str))  
+        {  
+            endIndex = i;  
+            string subStr"";  
+            subStr.append(str, startIndex, endIndex - startIndex);  
+            temp[currIndex] = subStr;  
+            currIndex += 1;  
+            startIndex = endIndex + 1;  
+        }  
+        i++;  
+        }     
+}
+
+split(data, ';')
+groups = temp;
+temp = [];
+
+for (int i = 0; i < len(groups); i++) {
+  split(groups[i], ',')
+  MEDDATA[i] = temp;
+  temp = [];
+}
+
+Serial.println(MEDDATA);
 
 // --- MAIN LOOP --- //
 
