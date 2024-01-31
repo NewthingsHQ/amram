@@ -296,6 +296,7 @@ std::string firebaseLoop() {
   WiFiClient client = server.available();
   if (client) {
     Serial.println("Connected to Amramconnect Client");
+    Serial.println(millis());
     String currentLine = "";
     currentTime = millis();
     previousTime = currentTime;
