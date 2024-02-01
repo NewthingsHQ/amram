@@ -292,7 +292,48 @@ string passFetch() {
 
 // --- FIREBASE --- //
 
-std::string firebaseLoop() {
+#include <WiFi.h>
+#include <HTTPClient.h>
+
+const char* ssid = "your-ssid";
+const char* password = "your-password";
+
+WiFiServer server(80);
+
+unsigned long currentTime;
+unsigned long previousTime;
+
+void setup() {
+  Serial.begin(115200);
+  delay(10);
+
+  // Connect to Wi-Fi
+  Serial.println();
+  Serial.println();
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+  
+  WiFi.begin(ssid, password);
+  
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  
+  Serial.println("");
+  Serial.println("WiFi connected.");
+  
+  // Start the server
+  server.begin();
+  Serial.println("Server started");
+}
+
+void loop() {
+  String data = firebaseLoop();
+  // Do something with the received data
+}
+
+String firebaseLoop() {
   WiFiClient client = server.available();
   if (client) {
     Serial.println("Connected to Amramconnect Client");
@@ -304,27 +345,29 @@ std::string firebaseLoop() {
     while (client.connected() && currentTime - previousTime <= 300000) {
       currentTime = millis();
       if (client.available()) {
-
+        String header = client.readStringUntil('\r');
+        
         if (header.indexOf("GET /data") >= 0) {
           HTTPClient http;
           http.begin("https://amram.click/data/getmeds.html");
           int httpCode = http.GET();
 
-          if (httpCode = 200) {
+          if (httpCode == 200) {
+            Serial.println("Connected 1");
             String payload = http.getString();
-            String dat = payload;
-            std::string DATA = dat.c_str();
             Serial.println("Data:");
-            Serial.print(dat);
-            return DATA;
+            Serial.println(payload);
+            return payload;
           } else {
             Serial.println("Error on HTTP request");
           }
 
-      http.end();
+          http.end();
+        }
+      }
     }
   }
-}}
+  return "";
 }
 
 // --- MEDICINE NOTIFICATION --- //
